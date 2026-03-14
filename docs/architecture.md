@@ -17,6 +17,13 @@ This repository is organized as a service-oriented monorepo for a stock platform
 3. SaaS clients call `api-gateway`.
 4. `api-gateway`, `analytics`, and `screener` consume canonical data from `datalake`.
 
+## Deployment topology (current phase)
+
+- Postgres runs in its own container as the platform system-of-record datastore.
+- OpenClaw runs in a separate container.
+- The platform service layer runs in a single service-stack container for this phase, with internal module boundaries kept strict so services can be split into separate containers later with minimal refactoring.
+- Database runtime is not embedded in service containers.
+
 ## Product sequencing
 
 Web UX is intentionally deferred until agentic workflows are validated in production-like conditions. During this phase, architecture emphasizes:
