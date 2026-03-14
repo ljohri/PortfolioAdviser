@@ -1,0 +1,20 @@
+---
+description: Web layer architectural constraints
+globs:
+  - "web/**"
+alwaysApply: true
+---
+
+# Web architecture constraints
+
+- `web` consumes `api-gateway`, never `datalake` directly.
+- Keep `datalake` as the source of truth for canonical platform data.
+- Keep service boundaries explicit: `datalake`, `mcp-stocklake`, `api-gateway`, `analytics`, `screener`.
+- Treat `mcp-stocklake` as the OpenClaw-facing tool service.
+- Keep `api-gateway` as the public SaaS-facing API boundary.
+- Keep `analytics` and `screener` as separate derived-data services.
+- Keep business logic in service layers, not route handlers.
+- Require MCP tools to wrap existing service-layer methods.
+- OpenClaw skills must provide concise tool-use guidance only.
+- Keep TimescaleDB migration concerns localized to storage layers and migrations.
+- Test coverage is mandatory at unit, integration, and E2E levels.

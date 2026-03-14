@@ -24,6 +24,7 @@ services/
   api-gateway/
   analytics/
   screener/
+web/
 openclaw/skills/stocklake/
 openclaw/skills/market-live/
 docs/
@@ -40,10 +41,12 @@ infra/
 - `mcp-market-live` is the OpenClaw/agent-facing MCP interface for current/live bars.
 - `api-gateway` is the SaaS facade.
 - `analytics` and `screener` are separate services with independent responsibilities.
-- Web UX is intentionally deferred until agentic workflows are validated.
+- `web` consumes `api-gateway` only and does not call `datalake` directly.
 
 See:
 - `docs/architecture.md`
+- `docs/overall-architecture.md`
+- `docs/openclaw-bringup-and-connection.md`
 - `docs/testing-strategy.md`
 
 ## Local development (scaffold phase)
@@ -126,6 +129,12 @@ Run strict live/provider smoke checks (requires `TIINGO_API_TOKEN`):
 
 ```bash
 make smoke-live
+```
+
+Bring up OpenClaw plus connected services (automated helper):
+
+```bash
+./scripts/bringup-openclaw.sh
 ```
 
 ### Run tests

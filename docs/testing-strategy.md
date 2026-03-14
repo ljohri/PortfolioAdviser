@@ -27,9 +27,14 @@ This strategy sets minimal but clear expectations for service-level testing whil
   - Integration: read contracts from datalake and output persistence/serialization.
   - E2E: analytics job input-to-output path.
 - `services/screener`
-  - Unit: screen predicates and ranking helpers.
-  - Integration: canonical input data and screener output contract.
-  - E2E: screening request-to-result path.
+  - Unit: rule evaluators and criteria-window helpers (`required_history_days`, validation warnings).
+  - Integration:
+    - canonical persistence boundary (seeded canonical tables/parquet -> screener engine output contract)
+    - current-price HTTP boundary (market-live adapter request/response handling)
+  - E2E:
+    - `POST /screen/run` request-to-result path
+    - evidence-field presence in screened output
+    - `POST /screen/validate` and `GET /screen/presets` workflow contract
 
 ## Coverage expectations
 
@@ -38,3 +43,4 @@ This strategy sets minimal but clear expectations for service-level testing whil
 - Non-negotiable:
   - all bug fixes include regression tests
   - new externally visible behavior includes at least one integration or E2E assertion
+  - test fixtures should stay deterministic and prefer real seeded data over heavy mocking

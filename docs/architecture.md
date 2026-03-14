@@ -11,6 +11,7 @@ This repository is organized as a service-oriented monorepo for a stock platform
 - `services/api-gateway`: SaaS facade for external consumers; exposes stable HTTP APIs and routes traffic to internal services.
 - `services/analytics`: independent service for analysis and derived insights.
 - `services/screener`: independent service for screening workflows and candidate selection.
+- `web`: user-facing application layer that consumes `api-gateway` APIs.
 
 ## Interaction model
 
@@ -21,6 +22,7 @@ This repository is organized as a service-oriented monorepo for a stock platform
 5. SaaS clients call `api-gateway`.
 6. `api-gateway` routes canonical/historical calls to `datalake` and live/current calls to `market-live`.
 7. `analytics` and `screener` consume canonical data from `datalake`.
+8. `web` consumes `api-gateway` and does not call `datalake` directly.
 
 ## Deployment topology (current phase)
 
