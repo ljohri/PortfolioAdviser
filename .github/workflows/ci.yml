@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - datalake
+          - mcp-stocklake
+          - api-gateway
+          - analytics
+          - screener
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest
+
+      - name: Run tests for service (if present)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_PATH="services/${{ matrix.service }}"
+          if [ ! -d "${SERVICE_PATH}/tests" ]; then
+            echo "No tests directory for ${SERVICE_PATH}; skipping."
+            exit 0
+          fi
+
+          TEST_FILES="$(rg --files "${SERVICE_PATH}/tests" -g "test_*.py" -g "*_test.py" || true)"
+          if [ -z "${TEST_FILES}" ]; then
+            echo "No Python test files for ${SERVICE_PATH}; skipping."
+            exit 0
+          fi
+
+          echo "Running tests for ${SERVICE_PATH}"
+          pytest "${SERVICE_PATH}/tests" -q

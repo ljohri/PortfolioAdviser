@@ -1,0 +1,13 @@
+---
+description: Stock platform monorepo scaffold conventions
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Monorepo conventions
+
+- Keep service boundaries explicit: `datalake`, `mcp-stocklake`, `api-gateway`, `analytics`, `screener`.
+- Treat `datalake` as system of record and avoid duplicating canonical state across services.
+- Keep scaffold changes lightweight: no business logic unless explicitly requested.
+- Require docs and tests to evolve together with each service implementation.

@@ -1,0 +1,11 @@
+---
+alwaysApply: false
+---
+# Workflow
+- Start each major task by updating docs/architecture.md or a service-specific doc if the task changes architecture.
+- Before editing many files, summarize the intended change in chat.
+- Run focused tests first, then the broader service test suite.
+- Keep route handlers thin.
+- Keep MCP tools thin.
+- Prefer composition over inheritance.
+- Add TODO markers only when accompanied by a doc entry or issue reference.

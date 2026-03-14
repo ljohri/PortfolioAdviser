@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: stocklake-postgres
+    environment:
+      POSTGRES_DB: stocklake
+      POSTGRES_USER: stocklake
+      POSTGRES_PASSWORD: stocklake
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stocklake -d stocklake"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  datalake:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo datalake placeholder && sleep infinity"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["placeholder"]
+
+  mcp-stocklake:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo mcp-stocklake placeholder && sleep infinity"]
+    depends_on:
+      datalake:
+        condition: service_started
+    profiles: ["placeholder"]
+
+  api-gateway:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo api-gateway placeholder && sleep infinity"]
+    depends_on:
+      datalake:
+        condition: service_started
+    profiles: ["placeholder"]
+
+  analytics:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo analytics placeholder && sleep infinity"]
+    depends_on:
+      datalake:
+        condition: service_started
+    profiles: ["placeholder"]
+
+  screener:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo screener placeholder && sleep infinity"]
+    depends_on:
+      datalake:
+        condition: service_started
+    profiles: ["placeholder"]
+
+volumes:
+  postgres_data:

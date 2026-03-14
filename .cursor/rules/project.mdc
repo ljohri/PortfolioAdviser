@@ -1,0 +1,35 @@
+---
+alwaysApply: false
+---
+# Project
+This repository is a monorepo for a stock platform with:
+- datalake service (system of record)
+- MCP service for OpenClaw/agent use
+- SaaS/API gateway
+- analytics service
+- screener service
+- later a web UX layer
+
+# Architecture rules
+- Keep business logic in services, not route handlers.
+- Keep storage access behind repository interfaces.
+- Do not duplicate domain logic between datalake, API, and MCP services.
+- MCP tools must call existing service-layer methods.
+- OpenClaw skills should contain guidance, not business logic.
+- Postgres is the initial system of record.
+- Keep the data model and repositories migration-friendly to TimescaleDB later.
+- DuckDB is for analytics and exports, not the primary write store.
+
+# Data rules
+- One canonical row per (ticker_id, trading_date).
+- All writes of daily bars must be idempotent upserts.
+- Missed-day backfills must work automatically.
+- Preserve raw and adjusted Tiingo fields.
+- Never spread provider-specific field names across the codebase; map them once.
+
+# Quality rules
+- Write tests with every feature.
+- Every PR-sized task should include unit tests.
+- Persistence or contract changes require integration tests.
+- User-facing workflows require E2E tests.
+- Prefer explicit typing and small files.
