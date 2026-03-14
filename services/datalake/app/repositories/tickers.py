@@ -30,6 +30,10 @@ class TickerRepository:
         statement = select(Ticker).order_by(Ticker.symbol.asc())
         return list(self._session.execute(statement).scalars().all())
 
+    def list_active_tickers(self) -> list[Ticker]:
+        statement = select(Ticker).where(Ticker.active.is_(True)).order_by(Ticker.symbol.asc())
+        return list(self._session.execute(statement).scalars().all())
+
     def create_or_get(self, payload: TickerCreate) -> Ticker:
         existing = self.get_by_symbol(payload.symbol)
         if existing:
@@ -67,3 +71,7 @@ class TickerRepository:
         state.message = message
         self._session.flush()
         return state
+
+    def get_sync_state(self, *, ticker_id: int) -> TickerSyncState | None:
+        statement = select(TickerSyncState).where(TickerSyncState.ticker_id == ticker_id)
+        return self._session.execute(statement).scalar_one_or_none()

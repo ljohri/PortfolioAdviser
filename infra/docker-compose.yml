@@ -1,4 +1,11 @@
 services:
+  # =============================================
+  # Docker environment ownership guide
+  # =============================================
+  # Keep container-topology/runtime wiring here (ports, internal hostnames,
+  # service-specific defaults). Do not hardcode real secrets in this file.
+  #
+  # Secret values should come from root `.env` via ${VAR} substitution.
   postgres:
     image: postgres:16-alpine
     container_name: stocklake-postgres
@@ -22,8 +29,11 @@ services:
       dockerfile: Dockerfile
     container_name: stocklake-datalake
     environment:
+      # Non-secret container-internal DB URL (postgres service hostname).
       DATABASE_URL: postgresql+psycopg://stocklake:stocklake@postgres:5432/stocklake
-      APP_ENV: dev
+      APP_ENV: ${APP_ENV:-dev}
+      TIINGO_BASE_URL: ${TIINGO_BASE_URL:-https://api.tiingo.com}
+      # Secret injected from root `.env` (or shell/CI env), not hardcoded here.
       TIINGO_API_TOKEN: ${TIINGO_API_TOKEN:-}
     ports:
       - "8000:8000"
@@ -40,12 +50,47 @@ services:
     profiles: ["placeholder"]
 
   api-gateway:
-    image: alpine:3.20
-    command: ["sh", "-c", "echo api-gateway placeholder && sleep infinity"]
+    build:
+      context: ../services/api-gateway
+      dockerfile: Dockerfile
+    container_name: stocklake-api-gateway
+    environment:
+      DATALAKE_BASE_URL: http://datalake:8000
+      DATALAKE_TIMEOUT_SECONDS: ${DATALAKE_TIMEOUT_SECONDS:-10}
+      MARKET_LIVE_BASE_URL: http://market-live:8001
+      MARKET_LIVE_TIMEOUT_SECONDS: ${MARKET_LIVE_TIMEOUT_SECONDS:-10}
+      APP_ENV: ${APP_ENV:-dev}
+    ports:
+      - "8080:8080"
     depends_on:
       datalake:
         condition: service_started
-    profiles: ["placeholder"]
+      market-live:
+        condition: service_started
+
+  market-live:
+    build:
+      context: ../services/market-live
+      dockerfile: Dockerfile
+    container_name: stocklake-market-live
+    environment:
+      TIINGO_BASE_URL: ${TIINGO_BASE_URL:-https://api.tiingo.com}
+      TIINGO_API_TOKEN: ${TIINGO_API_TOKEN:-}
+      APP_ENV: ${APP_ENV:-dev}
+    ports:
+      - "8001:8001"
+
+  mcp-market-live:
+    build:
+      context: ../services/mcp-market-live
+      dockerfile: Dockerfile
+    container_name: stocklake-mcp-market-live
+    environment:
+      MARKET_LIVE_BASE_URL: http://market-live:8001
+      MARKET_LIVE_TIMEOUT_SECONDS: ${MARKET_LIVE_TIMEOUT_SECONDS:-10}
+    depends_on:
+      market-live:
+        condition: service_started
 
   analytics:
     image: alpine:3.20

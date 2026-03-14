@@ -2,16 +2,30 @@
 
 Initial monorepo scaffold for a stock platform with agentic and SaaS-facing service boundaries.
 
+## Quickstart
+
+From repository root:
+
+```bash
+cp .env.example .env
+make up-core
+make migrate-datalake
+make smoke-live
+```
+
 ## Repository layout
 
 ```text
 services/
   datalake/
+  market-live/
   mcp-stocklake/
+  mcp-market-live/
   api-gateway/
   analytics/
   screener/
 openclaw/skills/stocklake/
+openclaw/skills/market-live/
 docs/
 infra/
 .github/workflows/
@@ -21,7 +35,9 @@ infra/
 ## Architecture at a glance
 
 - `datalake` is the system of record.
+- `market-live` handles current/latest market bars from provider APIs.
 - `mcp-stocklake` is the OpenClaw/agent-facing MCP interface.
+- `mcp-market-live` is the OpenClaw/agent-facing MCP interface for current/live bars.
 - `api-gateway` is the SaaS facade.
 - `analytics` and `screener` are separate services with independent responsibilities.
 - Web UX is intentionally deferred until agentic workflows are validated.
@@ -37,18 +53,35 @@ See:
 - Docker + Docker Compose
 - Python 3.11+
 
+### Environment configuration
+
+From repository root:
+
+```bash
+cp .env.example .env
+```
+
+Notes:
+
+- `.env.example` is the canonical variable contract for local development.
+- Docker Compose reads `.env` for variable substitution.
+- Local Python runs (`pytest`, `python -m mcp_stocklake`, `python -m mcp_market_live`, etc.) use the same variables.
+- Keep real secrets in uncommitted `.env` for local work.
+- Do not duplicate secrets in `infra/docker-compose.yml`; reference them with `${VAR}`.
+- Keep Docker-only topology values (for example container hostnames) in Compose.
+
 ### Start local dependencies
 
 From repository root:
 
 ```bash
-docker compose -f infra/docker-compose.yml up -d postgres
+make up-core
 ```
 
-To run the datalake API container against Postgres:
+Equivalent wrapper command (always uses root `.env` explicitly):
 
 ```bash
-docker compose -f infra/docker-compose.yml up --build -d datalake postgres
+./scripts/dev-compose.sh up -d --build postgres datalake market-live api-gateway
 ```
 
 Verify the API is healthy:
@@ -62,13 +95,37 @@ curl http://localhost:8000/health
 Stop containers:
 
 ```bash
-docker compose -f infra/docker-compose.yml down
+make down
 ```
 
 Stop containers and remove volumes (including Postgres data):
 
 ```bash
-docker compose -f infra/docker-compose.yml down -v
+make down-volumes
+```
+
+Inspect running services:
+
+```bash
+make ps
+```
+
+Run datalake migrations from the container:
+
+```bash
+make migrate-datalake
+```
+
+Run API gateway smoke checks:
+
+```bash
+make smoke
+```
+
+Run strict live/provider smoke checks (requires `TIINGO_API_TOKEN`):
+
+```bash
+make smoke-live
 ```
 
 ### Run tests

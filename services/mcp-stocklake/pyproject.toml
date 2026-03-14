@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stocklake-mcp-stocklake"
+version = "0.1.0"
+description = "FastMCP server for stocklake data operations"
+requires-python = ">=3.11"
+dependencies = [
+  "fastmcp>=2.0.0",
+  "sqlalchemy>=2.0.0",
+  "psycopg[binary]>=3.1.0",
+  "fastapi>=0.115.0",
+  "python-dotenv>=1.0.0",
+  "pytest>=8.0.0",
+  "pytest-asyncio>=0.23.0",
+  "uvicorn>=0.30.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mcp_stocklake*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+  "integration: tests that require Docker Postgres",
+  "e2e: end-to-end tests across datalake and MCP services",
+]

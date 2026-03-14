@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
 
-from app.main import create_app
+from app.api.main import create_app
 
 
-def test_api_gateway_health_smoke() -> None:
+def test_market_live_health_smoke() -> None:
     app = create_app()
     with TestClient(app) as client:
         response = client.get("/health")

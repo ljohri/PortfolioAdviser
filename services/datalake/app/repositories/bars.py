@@ -66,3 +66,32 @@ class BarRepository:
         self._session.execute(statement)
         self._session.flush()
         return len(rows)
+
+    def list_trading_dates(
+        self,
+        symbol: str,
+        *,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> list[date]:
+        statement: Select[tuple[date]] = (
+            select(DailyBar.trading_date)
+            .join(Ticker, Ticker.id == DailyBar.ticker_id)
+            .where(Ticker.symbol == symbol.upper())
+            .order_by(DailyBar.trading_date.asc())
+        )
+        if start_date:
+            statement = statement.where(DailyBar.trading_date >= start_date)
+        if end_date:
+            statement = statement.where(DailyBar.trading_date <= end_date)
+        return list(self._session.execute(statement).scalars().all())
+
+    def latest_trading_date(self, symbol: str) -> date | None:
+        statement: Select[tuple[date]] = (
+            select(DailyBar.trading_date)
+            .join(Ticker, Ticker.id == DailyBar.ticker_id)
+            .where(Ticker.symbol == symbol.upper())
+            .order_by(DailyBar.trading_date.desc())
+            .limit(1)
+        )
+        return self._session.execute(statement).scalar_one_or_none()
