@@ -45,10 +45,30 @@ From repository root:
 docker compose -f infra/docker-compose.yml up -d postgres
 ```
 
-To include placeholder service containers as needed:
+To run the datalake API container against Postgres:
 
 ```bash
-docker compose -f infra/docker-compose.yml --profile placeholder up -d
+docker compose -f infra/docker-compose.yml up --build -d datalake postgres
+```
+
+Verify the API is healthy:
+
+```bash
+curl http://localhost:8000/health
+```
+
+### Stop and cleanup
+
+Stop containers:
+
+```bash
+docker compose -f infra/docker-compose.yml down
+```
+
+Stop containers and remove volumes (including Postgres data):
+
+```bash
+docker compose -f infra/docker-compose.yml down -v
 ```
 
 ### Run tests
