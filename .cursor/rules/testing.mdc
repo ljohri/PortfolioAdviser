@@ -1,3 +1,13 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
+# Testing rules
+- Follow test pyramid: many unit tests, fewer integration tests, very selective E2E tests.
+- Add tests in the same step as implementation, not later.
+- For Python services use pytest.
+- For FastAPI routes use TestClient or async HTTPX tests as appropriate.
+- Integration tests must run against Dockerized dependencies when persistence or network boundaries matter.
+- E2E tests must verify real workflows across service boundaries.
+- Do not merge a new service contract without tests covering success, failure, and edge cases.
+- Keep fixtures reusable and deterministic.
+- Use factories for sample tickers, bars, and screening rules.
