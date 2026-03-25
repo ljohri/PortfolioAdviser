@@ -2,6 +2,8 @@
 
 `analytics` is a standalone Python service for derived portfolio analytics.
 
+Local venv (Jupyter / IDE): from repo root, `make venv-service SERVICE=analytics` then `source services/analytics/.venv/bin/activate`.
+
 ## Service boundaries
 
 - consumes canonical market data from the `datalake`

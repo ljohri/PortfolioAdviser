@@ -2,6 +2,8 @@
 
 `screener` is a dedicated Python service for rule-based stock screening over canonical market history.
 
+Local venv (Jupyter / IDE): from repo root, `make venv-service SERVICE=screener` then `source services/screener/.venv/bin/activate`.
+
 ## Scope
 
 - Evaluate screening criteria against canonical market data (`datalake` contracts only)

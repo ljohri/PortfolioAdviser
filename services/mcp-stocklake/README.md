@@ -15,13 +15,16 @@ For live/current bars, use `mcp-market-live`.
 
 ## Run locally
 
-From repository root:
+From repository root (uv workspace; requires `datalake` synced so datalake `app` imports resolve):
 
 ```bash
 cp .env.example .env
-python -m pip install -e services/datalake -e services/mcp-stocklake
-python -m mcp_stocklake
+uv sync --package stocklake-datalake
+uv sync --package stocklake-mcp-stocklake
+uv run python -m mcp_stocklake
 ```
+
+Isolated venv (includes editable `datalake` + `stocklake-tiingo`): from repo root run `make venv-service SERVICE=mcp-stocklake` then `source services/mcp-stocklake/.venv/bin/activate`.
 
 Environment variables:
 
@@ -33,8 +36,11 @@ Prefer setting these in root `.env` (copied from `.env.example`) so Docker and l
 
 ## Tests
 
+From repository root:
+
 ```bash
-pytest services/mcp-stocklake/tests -q
+uv sync --package stocklake-mcp-stocklake
+uv run --package stocklake-mcp-stocklake python -m pytest services/mcp-stocklake/tests -q
 ```
 
 Use Docker Postgres for integration and E2E cases:

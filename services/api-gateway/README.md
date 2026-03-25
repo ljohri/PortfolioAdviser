@@ -2,6 +2,14 @@
 
 `api-gateway` is the SaaS-facing facade for external API consumers.
 
+This service is **not** in the repo-root uv workspace. Use a **local** venv for development or Jupyter:
+
+```bash
+# from repository root
+make venv-service SERVICE=api-gateway
+source services/api-gateway/.venv/bin/activate
+```
+
 ## Responsibilities
 
 - Provide stable, versioned HTTP endpoints (`/v1/*`)

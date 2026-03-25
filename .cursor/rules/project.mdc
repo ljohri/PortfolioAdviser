@@ -21,6 +21,7 @@ This repository is a monorepo for a stock platform with:
 - DuckDB is for analytics and exports, not the primary write store.
 
 # Data rules
+- Tiingo HTTP calls use the shared package `packages/stocklake-tiingo`; keep provider field mapping in each service, not in the shared client.
 - One canonical row per (ticker_id, trading_date).
 - All writes of daily bars must be idempotent upserts.
 - Missed-day backfills must work automatically.

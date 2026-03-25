@@ -2,6 +2,8 @@
 
 This document defines the public SaaS-facing HTTP contract exposed by `services/api-gateway`.
 
+For interactive calls against a running gateway, use the template notebook [`services/api-gateway/notebooks/explore.ipynb`](../services/api-gateway/notebooks/explore.ipynb) (after `make venv-service SERVICE=api-gateway` and starting uvicorn or Compose).
+
 ## API gateway principles
 
 - Public API is versioned under `/v1`.

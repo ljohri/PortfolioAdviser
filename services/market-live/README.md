@@ -2,6 +2,19 @@
 
 `market-live` is the live market-data service for current bars/quotes.
 
+Tiingo HTTP calls use the shared package `stocklake-tiingo` (see `packages/stocklake-tiingo`), with a thin `app.services.tiingo_client` re-export.
+
+## Development
+
+Member of the **repo-root uv workspace**. From the repository root:
+
+```bash
+uv sync --package stocklake-market-live
+uv run --package stocklake-market-live python -m pytest tests -q
+```
+
+Isolated venv for notebooks (from repo root): `make venv-service SERVICE=market-live` then `source services/market-live/.venv/bin/activate`.
+
 ## Responsibilities
 
 - Fetch current/latest market bars directly from provider APIs
@@ -10,8 +23,12 @@
 
 ## Local run
 
+From repository root, install deps then start uvicorn from this service directory (so `app` resolves):
+
 ```bash
-uvicorn app.api.main:app --host 0.0.0.0 --port 8001 --reload
+uv sync --package stocklake-market-live
+cd services/market-live
+../../.venv/bin/uvicorn app.api.main:app --host 0.0.0.0 --port 8001 --reload
 ```
 
 Environment variables:
@@ -22,6 +39,8 @@ Environment variables:
 
 ## Tests
 
+Prefer (from repo root):
+
 ```bash
-pytest tests -q
+uv run --package stocklake-market-live python -m pytest services/market-live/tests -q
 ```

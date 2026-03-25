@@ -2,6 +2,8 @@
 
 `mcp-market-live` is the FastMCP server for live/current market data access.
 
+Local venv: from repo root, `make venv-service SERVICE=mcp-market-live` then `source services/mcp-market-live/.venv/bin/activate`.
+
 ## Implemented tools
 
 - `get_current_bar(symbol)`
@@ -11,7 +13,8 @@
 From repository root:
 
 ```bash
-python -m pip install -e services/mcp-market-live
+make venv-service SERVICE=mcp-market-live
+source services/mcp-market-live/.venv/bin/activate
 python -m mcp_market_live
 ```
 

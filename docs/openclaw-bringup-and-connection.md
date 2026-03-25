@@ -18,6 +18,8 @@ The provided script automates the following:
 - root `.env` file (copy from `.env.example`)
 - optional: `OPENCLAW_IMAGE` set in shell or `.env` (if omitted, default is used)
 
+To run MCP servers on the host (outside Docker), see **`docs/openclaw-integration.md`** for uv workspace setup and environment variables.
+
 ## Automated bring-up (recommended)
 
 From repository root:

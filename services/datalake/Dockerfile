@@ -1,17 +1,24 @@
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy
 
-WORKDIR /app
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-COPY pyproject.toml ./
-COPY app ./app
-COPY alembic.ini ./
-COPY alembic ./alembic
+WORKDIR /workspace
 
-RUN python -m pip install --no-cache-dir --upgrade pip && \
-    python -m pip install --no-cache-dir . uvicorn
+COPY pyproject.toml uv.lock ./
+COPY packages/stocklake-tiingo ./packages/stocklake-tiingo
+COPY services/datalake ./services/datalake
+COPY services/market-live ./services/market-live
+COPY services/mcp-stocklake ./services/mcp-stocklake
+
+RUN uv sync --frozen --package stocklake-datalake
+
+ENV PATH="/workspace/.venv/bin:$PATH"
+
+WORKDIR /workspace/services/datalake
 
 EXPOSE 8000
 

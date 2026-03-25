@@ -8,6 +8,20 @@ This strategy sets minimal but clear expectations for service-level testing whil
 - Integration tests: validate interactions across components (for example, service + datastore contract) with controlled dependencies.
 - End-to-end (E2E) tests: validate user- or agent-facing flows across multiple services from interface to persistence boundary.
 
+## Tooling: uv workspace (selected services)
+
+`datalake`, `market-live`, and `mcp-stocklake` are members of a **repo-root uv workspace** with a shared lockfile (`uv.lock`). They depend on `stocklake-tiingo` as a workspace package.
+
+- Prefer: from repository root, `uv sync --package <project-name>` then `uv run --package <project-name> python -m pytest <path> -q` (use `python -m pytest` so the synced environment is used).
+- Project names: `stocklake-datalake`, `stocklake-market-live`, `stocklake-mcp-stocklake`.
+- Other services (for example `api-gateway`, `analytics`, `screener`) are not in the workspace yet; install with `pip install ./services/<name>` in a virtual environment and run `pytest` as usual.
+
+CI mirrors this split (see `.github/workflows/ci.yml`).
+
+For **interactive notebooks** or a dedicated interpreter per service, use an isolated `services/<name>/.venv` via `make venv-service SERVICE=<name>` so you do not mix multiple top-level `app` packages in one environment.
+
+Starter notebooks live at `services/*/notebooks/explore.ipynb` (manual exploration only; **not** run in CI).
+
 ## Per-service expectations
 
 - `services/datalake`

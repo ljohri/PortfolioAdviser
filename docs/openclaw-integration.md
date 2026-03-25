@@ -4,13 +4,17 @@ This document describes how to run `mcp-stocklake` and `mcp-market-live`, wire t
 
 ## Run the MCP servers
 
-From repository root:
+From repository root, use [uv](https://docs.astral.sh/uv/) for workspace members (`datalake`, `mcp-stocklake` pull in `stocklake-tiingo`). `mcp-market-live` is not in the workspace yet; install it with pip into the same environment.
 
 ```bash
-python -m pip install -e services/datalake -e services/market-live -e services/mcp-stocklake -e services/mcp-market-live
-python -m mcp_stocklake
-python -m mcp_market_live
+uv sync --package stocklake-datalake
+uv sync --package stocklake-mcp-stocklake
+uv pip install ./services/mcp-market-live
+uv run python -m mcp_stocklake
+uv run python -m mcp_market_live
 ```
+
+`uv pip install` adds `mcp-market-live` into the workspace `.venv` at the repo root. `datalake` must be synced so `mcp_stocklake` can import datalake modules via its path bootstrap.
 
 Recommended environment variables:
 

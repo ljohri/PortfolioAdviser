@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stocklake-tiingo"
+version = "0.1.0"
+description = "Shared Tiingo HTTP client for stocklake services"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27.0",
+  "tenacity>=8.2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

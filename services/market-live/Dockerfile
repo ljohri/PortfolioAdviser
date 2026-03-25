@@ -1,11 +1,24 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy
 
-COPY pyproject.toml /app/pyproject.toml
-RUN pip install --no-cache-dir . uvicorn
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-COPY app /app/app
+WORKDIR /workspace
+
+COPY pyproject.toml uv.lock ./
+COPY packages/stocklake-tiingo ./packages/stocklake-tiingo
+COPY services/datalake ./services/datalake
+COPY services/market-live ./services/market-live
+COPY services/mcp-stocklake ./services/mcp-stocklake
+
+RUN uv sync --frozen --package stocklake-market-live
+
+ENV PATH="/workspace/.venv/bin:$PATH"
+
+WORKDIR /workspace/services/market-live
 
 EXPOSE 8001
 

@@ -12,12 +12,15 @@ This document describes the end-to-end platform architecture, service boundaries
 
 ## High-level components
 
+- `packages/stocklake-tiingo`
+  - shared async Tiingo client (daily EOD HTTP API, retries)
+  - consumed by `datalake` and `market-live` via thin service shims; not a runtime HTTP service
 - `services/datalake`
   - canonical historical EOD store
   - Tiingo-backed ingestion and backfill
   - Postgres persistence via SQLAlchemy + Alembic
 - `services/market-live`
-  - live/current bar reads from provider APIs
+  - live/current bar reads from provider APIs (uses the same shared Tiingo client library)
   - no canonical write-path ownership
 - `services/api-gateway`
   - SaaS-facing HTTP facade
@@ -80,5 +83,7 @@ flowchart LR
   - `http://localhost:8000/health` (`datalake`)
   - `http://localhost:8001/health` (`market-live`)
   - `http://localhost:8080/health` (`api-gateway`)
+- **Python tooling:** repo-root **uv** workspace (`pyproject.toml`, `uv.lock`) for `datalake`, `market-live`, `mcp-stocklake`; optional **per-service** `services/<name>/.venv` via `make venv-service SERVICE=<name>` or `scripts/bootstrap-service-venv.sh` for Jupyter/IDE isolation.
+- **API exploration:** template notebooks `services/*/notebooks/explore.ipynb` (not CI); see root `README.md`.
 
-For OpenClaw startup and automated wiring, see `docs/openclaw-bringup-and-connection.md`.
+For OpenClaw startup and automated wiring, see `docs/openclaw-bringup-and-connection.md`. For MCP install commands, see `docs/openclaw-integration.md`.

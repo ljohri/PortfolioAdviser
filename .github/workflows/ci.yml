@@ -11,26 +11,35 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service:
-          - datalake
-          - mcp-stocklake
-          - api-gateway
-          - analytics
-          - screener
+        include:
+          - service: datalake
+            uv_package: stocklake-datalake
+          - service: market-live
+            uv_package: stocklake-market-live
+          - service: mcp-stocklake
+            uv_package: stocklake-mcp-stocklake
+          - service: api-gateway
+            uv_package: ""
+          - service: analytics
+            uv_package: ""
+          - service: screener
+            uv_package: ""
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install test runner
-        run: python -m pip install --upgrade pip pytest
-
       - name: Run tests for service (if present)
+        env:
+          UV_PACKAGE: ${{ matrix.uv_package }}
         shell: bash
         run: |
           set -euo pipefail
@@ -40,11 +49,17 @@ jobs:
             exit 0
           fi
 
-          TEST_FILES="$(rg --files "${SERVICE_PATH}/tests" -g "test_*.py" -g "*_test.py" || true)"
-          if [ -z "${TEST_FILES}" ]; then
+          if ! find "${SERVICE_PATH}/tests" \( -name 'test_*.py' -o -name '*_test.py' \) -print -quit | grep -q .; then
             echo "No Python test files for ${SERVICE_PATH}; skipping."
             exit 0
           fi
 
           echo "Running tests for ${SERVICE_PATH}"
-          pytest "${SERVICE_PATH}/tests" -q
+          if [ -n "${UV_PACKAGE}" ]; then
+            uv sync --frozen --package "${UV_PACKAGE}"
+            uv run --package "${UV_PACKAGE}" python -m pytest "${SERVICE_PATH}/tests" -q
+          else
+            python -m pip install --upgrade pip
+            python -m pip install "${SERVICE_PATH}"
+            pytest "${SERVICE_PATH}/tests" -q
+          fi
